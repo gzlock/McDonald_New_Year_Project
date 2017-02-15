@@ -1,0 +1,41 @@
+<style>
+    .page4 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .page4 > div:nth-child(2) {
+        height: 10vh;
+    }
+
+    .page4 > div:nth-child(3) {
+        overflow: auto;
+    }
+</style>
+
+<div></div>
+<div>
+    <div class="edict">
+        <div class="top edict-bg"></div>
+        <div class="middle edict-bg">
+            <div class="content">
+                <h2 class="text-align-center red">领赏指引</h2>
+                <div class="yellow">
+                    <p>1.2017年2月14日前，在活动城市内除机场、火车站等交通枢纽餐厅、旅游景区餐厅等特殊餐厅外的麦当劳餐厅订餐前出示相应的“我的赏赐”即可享受该项免费产品或以优惠价购买新年优惠组合。</p>
+                    <p>2.使用时应由餐厅点餐员为您点击“我的赏赐”中的“确认领取”按钮进行兑换确认，同时页面将自动减去相应的“我的赏赐”数量。</p>
+                    <p>3.每次消费最多可同时兑换一张“我的赏赐”。</p>
+                    <p>4.“我的赏赐”兑换限每日上午10:30时后使用，具体以餐厅供应时间为准。</p>
+                    <p>5.食品以实物为准，图片仅供参考。除食品外，其他物品（包括容器）不在售卖范围内，本优惠不能与其他优惠同时使用。</p>
+                </div>
+            </div>
+        </div>
+        <div class="bottom edict-bg"></div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('.page4 .bottom').click(function () {
+            window.slideTo(3);
+        });
+    });
+</script>

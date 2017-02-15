@@ -1,0 +1,56 @@
+#PostgreSQL image
+postgres:
+  image: docker.io/postgres:alpine
+  restart: always
+  volumes:
+  - ./postgres_data:/var/lib/postgresql/data
+  - /etc/localtime:/etc/localtime
+  environment:
+  - POSTGRES_USER=yooooo
+  - POSTGRES_PASSWORD=12341234
+  ports:
+  - 54320:5432
+  log_driver: "none"
+
+#redis
+redis:
+  image: docker.io/redis:latest
+  restart: always
+  volumes:
+  - /etc/localtime:/etc/localtime
+  log_driver: "none"
+
+#nodejs image
+nodejs:
+  image: gzlock/node-pm2:latest
+  volumes:
+  - /etc/localtime:/etc/localtime
+  - ./www_nodejs:/app/host
+  restart: always
+  links:
+  - postgres:postgres
+  - redis:redis
+  command: sh ./start
+  log_driver: "json-file"
+  log_opt:
+    max-size: "1m"
+    max-file: "5"
+  ports: #暴露8081给redis-commander
+  - "8081:8081"
+
+#nginx programe image
+nginx:
+  image: docker.io/gzlock/nginx:latest
+  restart: always
+  volumes:
+  - /etc/localtime:/etc/localtime
+  - ./nginx_conf:/etc/nginx/conf.d
+  - ./ssl:/ssl
+  - ./www_nodejs:/www_nodejs
+  links:
+  # port 80
+  - nodejs
+  ports:
+  - "80:80"
+  - "443:443"
+  log_driver: "none"

@@ -1,0 +1,150 @@
+<style>
+    body > .window {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 100;
+    }
+
+    .window > .window_bg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        background: rgba(0, 0, 0, 0.7);
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+    }
+
+    .window.share > .edict {
+        background: url('/public/images/page2.png') no-repeat;
+        background-position-y: calc(-100vw * 0.290625);
+        background-size: 100vw;
+    }
+
+    .window > .edict {
+        position: absolute;
+        z-index: 2;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .window > .edict .top {
+        height: calc(100vw * 0.1556875);
+    }
+
+    .window > .edict .bottom {
+        height: calc(100vw * 0.1765625);
+        background-position-y: calc(-100vw * 0.159375);
+    }
+
+    .window > .edict .middle {
+        margin: -1px 0;
+        background-position-x: -100vw;
+        background-repeat: repeat-y !important;
+        box-sizing: border-box;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .window > .edict .middle .content img {
+        max-width: 100%;
+    }
+
+    .window > .edict .middle .content {
+        display: block;
+        margin: 0 auto;
+        box-sizing: border-box;
+        padding: 0 10px;
+        width: calc(100vw * 0.565625);
+        max-height: 70vh;
+        overflow: auto;
+        flex-grow: 1;
+    }
+
+    .window > .edict .middle .buttons > * {
+        margin: 0 auto;
+        width: calc(100vw * 0.3125);
+        height: calc(100vw * 0.09375);
+    }
+
+    .window .buttons .sure {
+        background-position: -200vw 0;
+    }
+
+    .window .buttons .get {
+        background-position: -200vw calc(-100vw * 0.09375);
+    }
+
+    .window .buttons .cancel {
+        background-position: -200vw calc(-100vw * 0.1875);
+    }
+
+    .window .window-content-bg {
+        background: url("/public/images/window.png") no-repeat;
+        background-size: 300vw;
+    }
+
+    .window.hide {
+        display: none;
+    }
+
+    .window .content h3 {
+        font-size: 1.5rem;
+    }
+
+    .window .content div {
+        font-size: 1.3rem;
+    }
+</style>
+
+<div class="window hide">
+    <div class="window_bg"></div>
+    <div class="edict">
+        <div class="top window-content-bg"></div>
+        <div class="middle window-content-bg">
+            <div class="content text-align-center">啦<br>啦<br>啦<br>啦<br>啦<br>啦</div>
+            <div class="buttons">
+                <div class="sure window-content-bg"></div>
+                <div class="get window-content-bg"></div>
+                <div class="cancel window-content-bg"></div>
+            </div>
+        </div>
+        <div class="bottom window-content-bg"></div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var $win = $('.window'), $content = $win.find('.content'), $buttons = $win.find('.buttons');
+        window.Window = new function () {
+            this.show = function (data) {
+                $win.is('.hide') && $win.removeClass('hide');
+                data.content && $content.empty().append(data.content);
+
+                !!data.sure ? $buttons.find('.sure').show() : $buttons.find('.sure').hide();
+                !!data.cancel ? $buttons.find('.cancel').show() : $buttons.find('.cancel').hide();
+                !!data.back ? $buttons.find('.back').show() : $buttons.find('.back').hide();
+                !!data.get ? $buttons.find('.get').show() : $buttons.find('.get').hide();
+                !!data.share ? $win.addClass('share') : $win.removeClass('share');
+
+                $buttons.unbind().on('click', '> div', function () {
+                    var $this = $(this), feedback;
+                    var trueOrFalse = $this.is('.sure') || $this.is('.get');
+                    if (data.callback)
+                        feedback = data.callback(trueOrFalse);
+                    if (feedback !== false)
+                        Window.hide();
+                });
+            };
+            this.hide = function () {
+                !$win.is('.hide') && $win.addClass('hide');
+            };
+        };
+    });
+</script>

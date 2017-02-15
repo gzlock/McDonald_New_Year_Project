@@ -1,0 +1,32 @@
+{
+  "name": "pm2",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "pm2 start process.json --env dev"
+  },
+  "dependencies": {
+    "pg": "*",
+    "pg-hstore": "*",
+    "sequelize": "*",
+    "koa": "2",
+    "koa-router": "next",
+    "koa-ejs": "*",
+    "koa-bodyparser": "next",
+    "koa-generic-session": "latest",
+    "koa-redis": "latest",
+    "moment": "*",
+    "later": "*",
+    "async": "*",
+    "ioredis": "*",
+    "lodash": "*",
+    "request": "*",
+    "wechat": "*",
+    "wechat-api": "*",
+    "wechat-oauth": "*",
+    "node-xlsx": "*",
+    "koa-multer": "*"
+  },
+  "author": "",
+  "license": "MIT"
+}

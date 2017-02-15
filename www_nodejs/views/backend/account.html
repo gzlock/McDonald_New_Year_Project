@@ -1,0 +1,64 @@
+<!--账号管理-->
+<div class="ui form" id="admin">
+    <div class="field">
+        <button class="ui green button " @click="add">添加账号</button>
+    </div>
+    <div class="fields" v-for="a in account">
+        <div class="field">
+            <label>账号</label><input v-model="a.username">
+        </div>
+        <div class="field">
+            <label>密码</label><input v-model="a.password">
+        </div>
+        <div class="field">
+            <label>管理员</label>
+            <div class="ui checkbox" :class="{checked:(a.config && a.config.admin)}">
+                <input type="checkbox" v-model="a.config.admin">
+                <label></label>
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <button @click="save" class="ui basic blue button" :disabled="saving" :class="{loading:saving}">保存</button>
+    </div>
+    <div class="ui message" :class="{green:message.type==0,red:message.type==1}" v-show="!!message.text">
+        <div class="header">{{message.text}}</div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var defaultAccount = {username: null, password: null, config: {}};
+        var data = {
+            i: '<%-admin.username%>',
+            account: JSON.parse('<%-JSON.stringify(account)%>'),
+            saving: false,
+            message: {text: null, type: null}
+        };
+        new Vue({
+            el: '#admin', data: data, methods: {
+                save: function () {
+                    //检查账号是否有相同
+                    var username = _.keyBy(data.account, 'username');
+                    if (Object.keys(username).length != data.account.length)
+                        return data.message = {text: '存在相同的账号', type: 1};
+                    for (var i in data.account) {
+                        if (_.isEmpty(data.account[i].username) || _.isEmpty(data.account[i].password))
+                            return data.message = {text: '有些内容为空，请补填', type: 1};
+                    }
+                    data.saving = true;
+                    data.message.text = null;
+                    $.post({url: '', data: JSON.stringify(data.account)}).then(function () {
+                        data.saving = false;
+                        data.message = {text: '保存成功', type: 0};
+                    }).catch(function () {
+                        data.saving = false;
+                        data.message = {text: '保存失败', type: 1};
+                    });
+                },
+                add: function () {
+                    data.account.push(Object.assign({}, defaultAccount));
+                }
+            }
+        });
+    });
+</script>

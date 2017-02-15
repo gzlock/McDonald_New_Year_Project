@@ -1,0 +1,120 @@
+{
+  "apps": [
+    {
+      "name": "Redis管理",
+      "interpreter": "sh",
+      "script": "start-redis-commander",
+      "max_restarts": 1
+    },
+    {
+      "name": "数据库变动",
+      "script": "mysql.js",
+      "node_args": "--harmony-async-await",
+      "max_restarts": 1,
+      "restart_delay": 500,
+      "autorestart": false,
+      "watch": [
+        "mysql.js",
+        "sequelize",
+        "config.js"
+      ],
+      "env_production": {
+        "NODE_ENV": "production"
+      }
+    },
+    {
+      "name": "后端数据",
+      "script": "worker.js",
+      "node_args": "--harmony-async-await",
+      "max_restarts": 1,
+      "autorestart": false,
+      "watch": [
+        "worker.js",
+        "config.js",
+        "sequelize",
+        "routers/backend",
+        "function"
+      ],
+      "env": {
+        "NODE_ENV": "dev",
+        "WORK_PATH": "backend",
+        "PORT": 81
+      },
+      "env_production": {
+        "NODE_ENV": "production",
+        "WORK_PATH": "backend",
+        "PORT": 81
+      }
+    },
+    {
+      "name": "前端",
+      "script": "worker.js",
+      "node_args": "--harmony-async-await",
+      "max_restarts": 1,
+      "autorestart": false,
+      "restart_delay": 300,
+      "watch": [
+        "worker.js",
+        "config.js",
+        "sequelize",
+        "routers/frontend",
+        "function"
+      ],
+      "env": {
+        "NODE_ENV": "dev",
+        "WORK_PATH": "frontend",
+        "PORT": 80
+      },
+      "env_production": {
+        "NODE_ENV": "production",
+        "WORK_PATH": "frontend",
+        "PORT": 80
+      }
+    },
+    {
+      "name": "定时统计",
+      "script": "timingTask.js",
+      "node_args": "--harmony-async-await",
+      "max_restarts": 1,
+      "restart_delay": 300,
+      "autorestart": false,
+      "watch": [
+        "timingTask.js",
+        "config.js",
+        "sequelize"
+      ]
+    },
+    {
+      "name": "微信Token",
+      "script": "weChatAccessToken.js",
+      "node_args": "--harmony-async-await",
+      "watch": [
+        "weChatAccessToken.js",
+        "config.js"
+      ],
+      "env": {
+        "NODE_ENV": "dev"
+      },
+      "env_production": {
+        "NODE_ENV": "production"
+      }
+    },
+    {
+      "name": "测试用的",
+      "script": "test.js",
+      "node_args": "--harmony-async-await",
+      "max_restarts": 1,
+      "restart_delay": 300,
+      "autorestart": false,
+      "watch": [
+        "test.js"
+      ],
+      "env": {
+        "NODE_ENV": "dev"
+      },
+      "env_production": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

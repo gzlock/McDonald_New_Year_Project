@@ -1,0 +1,52 @@
+<div class="ui two column stackable centered grid">
+    <div class="column">
+        <div class="ui segment form" id="form" @keyup.enter="submit">
+            <div class="field">
+                <label>账号</label>
+                <input placeholder="账号" autofocus v-model="form.a">
+            </div>
+            <div class="field">
+                <label>密码</label>
+                <input placeholder="密码" type="password" v-model="form.b">
+            </div>
+            <button class="ui button blue" :disabled="loading" @click="submit" :class="{loading:loading}">登录</button>
+            <div class="ui message" :class="{green:message.type==1,red:message.type==0}"
+                 v-show="!!message.text">{{message
+                .text}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var data = {form: {a: null, b: null}, message: {type: null, text: null}, loading: false};
+        new Vue({
+            el: '#form', data: data, methods: {
+                submit: function () {
+                    if (data.loading)return;
+                    data.loading = true;
+                    data.message.type = null;
+                    data.message.text = null;
+                    $.post({url: '/data', data: JSON.stringify(data.form)})
+                        .then(function () {
+                            data.message.type = 1;
+                            data.message.text = '登录成功，请稍候';
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1500);
+                        })
+                        .catch(function (res) {
+                            data.message.type = 0;
+                            try {
+                                data.message.text = res.responseJSON.message;
+                            } catch (e) {
+                                data.message.text = '服务器发生错误';
+                            }
+                            data.loading = false;
+                        });
+                }
+            }
+        })
+    })();
+</script>

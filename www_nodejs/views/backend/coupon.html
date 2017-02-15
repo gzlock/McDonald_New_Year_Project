@@ -1,0 +1,216 @@
+<div id="coupons" class="ui form">
+    <div class="inline field">
+        <button class="ui green button" @click="editCoupon()">添加</button>
+        <label>数量: {{length}}</label>
+    </div>
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        已经启用的券
+    </h4>
+    <div class="field ui four column stackable grid">
+        <div class="column" v-for="c in enable">
+            <div class="ui green segment" @click="editCoupon(c)">
+                <div class="ui ribbon label" :class="{red:c.type==0,green:c.type==1}">
+                    {{c.type==0 ? '优惠券':'兑换券'}}
+                </div>
+                <span>{{c.name}}</span>
+                <div class="ui fluid image">
+                    <img :src="'/public/images/coupons/' + (c.cover ? c.cover : 'empty.png')">
+                </div>
+            </div>
+        </div>
+    </div>
+    <h4 class="ui horizontal divider header">
+        <i class="tag icon"></i>
+        不启用的券(券不会显示，也无法使用)
+    </h4>
+    <div class="field ui four column stackable grid">
+        <div class="column" v-for="c in disable">
+            <div class="ui segment" @click="editCoupon(c)">
+                <div class="ui ribbon label" :class="{red:c.type==0,green:c.type==1}">
+                    {{c.type==0 ? '优惠券':'兑换券'}}
+                </div>
+                <span>{{c.name}}</span>
+                <div class="ui fluid image">
+                    <img :src="'/public/images/coupons/' + (c.cover ? c.cover : 'empty.png')">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui basic small modal">
+        <div class="ui icon header"><i class="edit small icon"></i>{{edit.isNew ? '添加' : '编辑'}} 券
+        </div>
+        <div class="content ui inverted form">
+            <div class="fields">
+                <div class="field">
+                    <label>封面图片</label>
+                    <button class="ui blue button" @click="uploadImg"
+                            :class="{loading:edit.uploading}" :disabled="edit.uploading">
+                        上传
+                    </button>
+                    <input type="file" style="display: none;">
+                </div>
+                <div class="field">
+                    <img :src="'/public/images/coupons/'+(edit.coupon.cover?edit.coupon.cover:'empty.png')"
+                         style="width: 80px;border: 2px solid #fff;">
+                </div>
+            </div>
+            <div class="field">
+                <label>名称</label>
+                <input type="text" v-model="edit.coupon.name" placeholder="输入名称">
+            </div>
+            <div class="inline field">
+                <label>券的类型</label>
+                <select class="ui selection dropdown" v-model="edit.coupon.type">
+                    <option value="">请选择</option>
+                    <option value="0">优惠券</option>
+                    <option value="1">兑换券</option>
+                </select>
+            </div>
+            <div class="inline field">
+                <label>每天限量</label>
+                <input type="number" v-model="edit.coupon.limit">
+            </div>
+            <div class="field">
+                <div>* 0 为不限制数量</div>
+            </div>
+            <div class="inline field">
+                <label>是否启用</label>
+                <div class="ui fitted toggle checkbox">
+                    <input type="checkbox" v-model="edit.coupon.enable">
+                    <label></label>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="ui red basic cancel inverted button">
+                <i class="remove icon"></i>
+                取消
+            </button>
+            <button class="ui green ok inverted button"
+                    :class="{loading:edit.saving||edit.uploading}" :disabled="edit.saving||edit.uploading">
+                <i class="checkmark icon"></i>
+                保存
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var defaultCoupon = {img: null, name: null, desc: null, length: 0, money: 0, enable: true, type: 0};
+        var $upload = $('input[type="file"]').change(function () {
+                data.edit.uploading = true;
+                var formData = new FormData();
+                formData.append('image', this.files[0]);
+                $.post({
+                    url: '/data/coupon/upload',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                }).then(function (res) {
+                    data.edit.uploading = false;
+                    data.edit.coupon.cover = res;
+                }).catch(function (res) {
+                    data.edit.uploading = false;
+                    var message;
+                    if (res && res.responseJSON && res.responseJSON.message)
+                        message = res.responseJSON.message;
+                    else
+                        message = '图片上传失败';
+                    alert(message);
+                });
+            }),
+            $window;
+        var data = {
+            coupons: [],
+            message: {text: null, type: null},
+            loading: true,
+            edit: {
+                isNew: false,
+                saving: false,
+                uploading: false,
+                coupon: Object.assign({}, defaultCoupon),
+            }
+        };
+        var vue = new Vue({
+            el: '#coupons',
+            data: data,
+            methods: {
+                editCoupon: function (coupon) {
+                    var isNew = data.edit.isNew = !coupon, _coupon;
+                    if (!coupon) {
+                        _coupon = data.edit.coupon = Object.assign({}, defaultCoupon);
+                    } else {
+                        _coupon = data.edit.coupon = Object.assign({}, coupon);
+                    }
+                    data.edit.saving = false;
+                    vue.$nextTick(function () {
+                        $('.ui.checkbox').checkbox();
+                        $('.ui.dropdown').dropdown();
+                        $window.modal('setting', {
+                            closable: false,
+                            detachable: true,
+                            autofocus: false,
+                            onApprove: function () {
+                                if (data.edit.saving)
+                                    return;
+                                data.edit.saving = true;
+                                $.post({url: '', data: JSON.stringify(_coupon)}).then(function (res) {
+                                    data.edit.saving = false;
+                                    if (isNew) {
+                                        data.coupons.push(Object.assign(_coupon, {id: res.id}));
+                                    } else {
+                                        Object.assign(coupon, _coupon);
+                                    }
+                                    data.edit.coupon = Object.assign({}, defaultCoupon);
+                                    $window.modal('hide');
+                                }).catch(function () {
+                                    data.edit.saving = false;
+                                });
+                                return false;
+                            }
+                        }).modal('show');
+                    });
+                },
+                uploadImg: function () {
+                    if (data.edit.uploading)
+                        return;
+                    $upload.trigger('click');
+                },
+            },
+            computed: {
+                length: function () {
+                    return this.coupons.length;
+                },
+                enable: function () {
+                    var list = [];
+                    data.coupons.map(function (coupon) {
+                        if (coupon.enable)
+                            list.push(coupon);
+                    });
+                    return list;
+                },
+                disable: function () {
+                    var list = [];
+                    data.coupons.map(function (coupon) {
+                        if (!coupon.enable)
+                            list.push(coupon);
+                    });
+                    return list;
+                }
+            }
+        });
+        vue.$nextTick(function () {
+            $window = $('.modal').modal();
+        });
+        $.get('/data/coupon/list').then(function (res) {
+            data.loading = false;
+            data.coupons = res;
+        }).catch(function () {
+            data.loading = false;
+        });
+    })
+</script>

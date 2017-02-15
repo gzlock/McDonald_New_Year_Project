@@ -1,0 +1,144 @@
+<style>
+    .page3 .bg {
+        background: url("/public/images/page3.png") no-repeat;
+        background-size: 200vw;
+    }
+
+    .page3 .coupons {
+        background-position-y: bottom;
+        height: 100vh;
+        position: relative;
+    }
+
+    .page3 .container {
+        position: absolute;
+        width: calc(100vw * 0.6140625);
+        height: calc(100vw * 0.9375);
+        left: calc(100vw * 0.1953125);
+        bottom: calc(100vw * 0.225);
+        overflow: auto;
+        padding: 5px;
+        box-sizing: border-box;
+        /*background: rgba(0, 255, 0, 0.5);*/
+    }
+
+    .page3 .coupon {
+        float: left;
+        box-sizing: border-box;
+        width: 50%;
+        padding: 10px 0;
+        flex-grow: 1;
+        position: relative;
+    }
+
+    .page3 .coupon .label {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        background: #fadeca;
+        border: 3px solid #daa54f;
+        border-radius: 50%;
+        right: 0;
+        top: 0;
+        z-index: 1;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+    }
+
+    .page3 .coupon img {
+        width: calc(100vw * 0.2828125);
+        height: calc(100vw * 0.2578125);
+        background-position-x: -100vw;
+    }
+
+    .page3 .buttons {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        width: 100vw;
+        height: calc(100vw * 0.078125);
+        bottom: calc(100vw * 0.0515625);
+        left: 0;
+    }
+
+    .page3 .buttons > * {
+        flex-grow: 1;
+    }
+</style>
+<div class="bg coupons" id="coupons">
+    <div class="container">
+        <div class="coupon" v-for="coupon in coupons" @click="use(coupon)">
+            <div class="label bg text-align-center red">{{coupon.ucship.count}}</div>
+            <img class="bg" :src="'/public/images/coupons/'+coupon.cover">
+        </div>
+    </div>
+</div>
+<div class="buttons">
+    <div></div>
+    <div></div>
+</div>
+<script>
+    $(function () {
+        window.newCoupon = function (coupon) {
+            var has = false;
+            for (var i = 0; i < data.coupons.length; i++) {
+                if (data.coupons[i].id == coupon.id) {
+                    has = true;
+                    data.coupons[i].ucship.count++;
+                    break;
+                }
+            }
+            if (!has)
+                data.coupons.push(Object.assign({ucship: {count: 1}}, coupon));
+        };
+        var data = {coupons: userData.coupons};
+        var vue = new Vue({
+            el: '#coupons', data: data, methods: {
+                use: function (coupon) {
+                    var content = '<img src="/public/images/coupons/' + coupon.cover + '"><h3 class="text-align-center red">您是否确认领取此奖品？</h3>';
+                    if (coupon.type == 1)
+                        content += '<div class="text-align-center yellow">（到活动地区麦当劳餐厅任意消费，即可免费兑换，请给予店员点击兑换）</div>';
+                    else
+                        content += '<div class="text-align-center yellow">（请给予店员点击兑换）</div>';
+                    Window.show({
+                        content: content,
+                        get: true,
+                        cancel: true,
+                        callback: function (trueOrFalse) {
+                            if (!trueOrFalse)
+                                return;
+                            Window.show({
+                                content: '<h3 class="text-align-center red">正在与服务器通讯，请稍候</h3>'
+                            });
+                            $.get('/coupon/use/' + coupon.id).then(function (res) {
+                                if (0 == --coupon.ucship.count) {
+                                    data.coupons.splice(data.coupons.indexOf(coupon), 1);
+                                }
+                                Window.show({
+                                    content: '<img src="/public/images/coupons/' + coupon.cover + '"><h3 class="text-align-center red">成功兑换</h3>',
+                                    sure: true,
+                                });
+                            }).catch(function (res) {
+                                console.log(res);
+                                var message = '领取失败，请重新尝试';
+                                Window.show({
+                                    content: message,
+                                    sure: true
+                                });
+                            });
+                            return false;
+                        }
+                    });
+                }
+            }
+        });
+        $('.page3 .buttons > :nth-child(1)').click(function () {
+            window.slideTo(4);
+        });
+        $('.page3 .buttons > :nth-child(2)').click(function () {//返回按钮
+            window.slideTo(1);
+        });
+    });
+</script>

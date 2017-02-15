@@ -1,0 +1,4 @@
+#/bin/bash
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+cnpm install -g redis-commander
+redis-commander --redis-host redis --http-u root --http-p 123

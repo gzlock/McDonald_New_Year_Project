@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>麦麦开工大利是</title>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="full-screen" content="yes">
+    <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <!--<script src="https://cdn.bootcss.com/lodash.js/4.17.4/lodash.min.js"></script>
+
+    <script src="//cdn.bootcss.com/tween.js/r14/Tween.min.js"></script>
+    <script src="//cdn.bootcss.com/pixi.js/4.3.0/pixi.min.js"></script>
+    <script src="//cdn.bootcss.com/stats.js/r16/Stats.min.js"></script>-->
+
+    <!--Vue-->
+    <script src="//cdn.bootcss.com/vue/2.1.8/vue.min.js"></script>
+
+    <!--Swiper-->
+    <link href="//cdn.bootcss.com/Swiper/3.4.1/css/swiper.min.css" rel="stylesheet">
+    <script src="//cdn.bootcss.com/Swiper/3.4.1/js/swiper.min.js"></script>
+
+    <!--WeChat-->
+    <script src="//res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            position: relative;
+            height: 100%;
+            font-size: 62.5%;
+        }
+
+        body {
+            background: url("/public/images/bg.jpg") #ecb43f no-repeat;
+            background-size: 100vw;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            color: #000;
+            font-size: 1.5rem;
+        }
+
+        * {
+            outline: none;
+        }
+
+        button {
+            border: 1px solid black;
+        }
+
+        .swiper-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            position: relative;
+        }
+
+        .text-align-center {
+            text-align: center;
+        }
+
+        h2, h3, h4 {
+            margin: 5px;
+        }
+
+        .red {
+            color: #e32622;
+        }
+
+        .yellow {
+            color: #c0802c;
+        }
+
+        .music {
+            background: black;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            border-radius: 50%;
+            z-index: 99;
+            width: 10vw;
+            animation: music-rotate 5s infinite linear running;
+            -webkit-animation: music-rotate 5s infinite linear running;
+        }
+
+        .music.pause {
+            animation-play-state: paused;
+            -webkit-animation-play-state: paused;
+        }
+
+        @-webkit-keyframes music-rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes music-rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+    <script>
+        $(function () {
+            var music = new Audio();
+            music.src = '/public/1.mp3';
+            music.volume = 0.4;
+            music.loop = true;
+            var $music = $('.music').click(function () {
+                $music.toggleClass('pause');
+                if ($music.is('.pause')) {
+                    music.pause();
+                } else {
+                    music.play();
+                }
+            });
+            $.ajaxSetup({timeout: 5000});
+            var weChatConfig = JSON.parse('<%-weChatConfig%>');
+            var config = {
+                title: '麦麦开工大利是',
+                link: 'http://' + window.location.host,
+                desc: '麦麦赠你开工大利是，快来享受新年美食福利！',
+                imgUrl: 'http://' + window.location.host + '/public/images/logo.jpg',
+                success: function () {
+//                    console.log('微信 success');
+                    $.ajax('/share').then(function () {
+                        userData.share++;
+                        Window.show({
+                            content: '<h3 class="red text-align-center">成功增加一次领赏机会，每天仅限一次哦～</h3>',
+                            sure: true
+                        });
+                    }).catch(function () {
+                        Window.show({
+                            content: '<h3 class="text-align-center">今天已经领取过增加一次的领赏机会了哟～</h3>',
+                            sure: true
+                        });
+                    });
+                }
+            };
+            wx.config(weChatConfig);
+            wx.ready(function () {
+                console.log('微信config成功');
+                wx.onMenuShareTimeline(config);
+                wx.onMenuShareAppMessage(config);
+                wx.onMenuShareQQ(config);
+                wx.onMenuShareWeibo(config);
+                wx.onMenuShareQZone(config);
+                music.play();
+            });
+            wx.error(function (err) {
+                console.log('微信config失败', err);
+            });
+        });
+        window.OnSwipe = {};
+        window.userData = JSON.parse('<%-userData%>');
+    </script>
+</head>
+<body>
+<!---->
+<img class="music" src="/public/images/music.png">
+<!---->
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        <%for(let i=1;i <= pages;i++){let page = 'page'+i;%>
+        <div class="swiper-slide <%=page%>">
+            <%-include(page+'.html',{index:i})%>
+        </div>
+        <% } %>
+    </div>
+</div>
+<script>
+    window.swiper = new Swiper('.swiper-container', {
+        noSwiping: true,
+        noSwipingClass: 'swiper-slide',
+        speed: 0,
+        runCallbacksOnInit: true,
+        direction: 'vertical',
+        onInit: function (swiper) {
+            var index = swiper.activeIndex + 1 + '';
+            console.log('swiper onInit', index);
+            window.OnSwipe[index] && window.OnSwipe[index]();
+        },
+        onSlideChangeEnd: function (swiper) {
+            var index = swiper.activeIndex + 1 + '';
+            console.log('swiper onSlideChangeEnd', index);
+            window.OnSwipe[index] && window.OnSwipe[index]();
+        }
+    });
+    window.slideTo = function (index) {
+        window.swiper.slideTo(--index);
+    }
+</script>
+<style>
+    .swiper-slide .edict {
+        position: absolute;
+        z-index: 2;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .swiper-slide .edict .top {
+        flex-shrink: 0;
+        height: calc(100vw * 0.1875);
+    }
+
+    .swiper-slide .edict .bottom {
+        flex-shrink: 0;
+        height: calc(100vw * 0.265625);
+        background-position: -100vw 0;
+    }
+
+    .swiper-slide .edict .middle {
+        margin: -2px 0;
+        background-position-x: -200vw;
+        background-repeat: repeat-y !important;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        max-height: 60vh;
+    }
+
+    .swiper-slide .edict .middle .content {
+        margin: 0 auto;
+        box-sizing: border-box;
+        padding: 0 15px;
+        width: calc(100vw * 0.66875);
+        overflow: auto;
+    }
+
+    .swiper-slide .edict-bg {
+        background: url("/public/images/edict.png") no-repeat;
+        background-size: 300vw;
+    }
+</style>
+<!--window start-->
+<%-include('./window.html')%>
+<!--window end-->
+<div style="display: none;">
+    <script src="https://s9.cnzz.com/z_stat.php?id=5721404&web_id=5721404" language="JavaScript"></script>
+</div>
+</body>
+</html>

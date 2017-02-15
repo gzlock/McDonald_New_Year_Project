@@ -1,0 +1,45 @@
+<div class="ui horizontal divider"><i class="setting icon"></i>全局设置，仅管理员可见</div>
+<div id="config">
+    <div class="inline field">
+        <label>获得兑换券的几率</label>
+        <div class="ui right labeled input">
+            <div class="ui basic label">1 /</div>
+            <input type="text" placeholder="20" v-model="config.percent">
+            <div class="ui basic label"> = {{1/config.percent*100}}%</div>
+        </div>
+    </div>
+    <div class="inline fields">
+        <div class="field">
+            <button class="ui green button" @click="save" :class="{loading:saving}" :disabled="saving">保存</button>
+        </div>
+        <div class="field">
+            <label class="ui left pointing basic label" v-show="!!message.text" :class="{red:message.type==0,green:message.type==1}">{{message.text}}</label>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var data = {
+            config: JSON.parse('<%-JSON.stringify(config)%>'),
+            saving: false,
+            message: {text: null, type: null}
+        };
+        new Vue({
+            el: '#config',
+            data: data,
+            methods: {
+                save: function () {
+                    data.saving = true;
+                    data.message.text = null;
+                    $.post({url: '/data/config', data: JSON.stringify(data.config)}).then(function () {
+                        data.message = {text: '保存成功', type: 1};
+                    }).catch(function () {
+                        data.message = {text: '保存失败', type: 0};
+                    }).done(function () {
+                        data.saving = false;
+                    });
+                }
+            }
+        });
+    });
+</script>

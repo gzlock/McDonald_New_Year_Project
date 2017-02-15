@@ -1,0 +1,94 @@
+<style>
+    .page2 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .page2 .top {
+        height: 10vh;
+        flex-shrink: 0;
+        /*background: rgba(255, 0, 0, 0.5);*/
+    }
+
+    .page2 > :nth-child(3) {
+        flex-grow: 1;
+        overflow: auto;
+        /*background: rgba(0, 255, 0, 0.5);*/
+    }
+
+    .page2 .bottom {
+        height: calc(100vw * 0.165625);
+        margin-bottom: calc(100vw * 0.090625);
+        background: rgba(0, 0, 255, 0.5);
+        display: flex;
+        flex-direction: row;
+        background: url("/public/images/page2.png") no-repeat;
+        background-size: 100vw;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+
+    .page2 .bottom > div {
+        flex-grow: 1;
+    }
+
+    #newCouponContent {
+        display: flex;
+        align-items: center;
+    }
+
+    #newCouponContent img {
+        max-width: 100%;
+        margin-bottom: 15px;
+    }
+
+    #newCouponContent img.shadow {
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    #newCouponContent > div {
+        width: 85vw;
+        margin: auto;
+    }
+</style>
+<div class="top"></div>
+<div id="newCouponContent">
+    <new-coupon :coupon="coupon"></new-coupon>
+</div>
+<div class="bottom">
+    <div></div>
+    <div></div>
+</div>
+<script id="newCouponContentTP" type="text/html">
+    <div class="text-align-center" v-if="coupon != null">
+        <div><img :src='"/public/images/coupons/"+coupon.cover' :class="{shadow:coupon.type==0}"></div>
+        <h3 class="yellow">恭喜您获得</h3>
+        <h2 class="red" v-if="coupon.type==0">麦当劳优惠券一张！</h2>
+        <h2 class="red" v-else>{{coupon.name}}免费兑换券一张！</h2>
+        <div class="yellow" v-if="coupon.type==0">（到活动地区麦当劳餐厅即可以优惠价格换购{{coupon.name}}，快来享用吧！）</div>
+        <div class="yellow" v-else>（到活动地区麦当劳餐厅任意消费，即可免费兑换{{coupon.name}}一份，快来享用吧！）</div>
+    </div>
+</script>
+<script>
+    Vue.component('new-coupon', {template: '#newCouponContentTP', props: ['coupon']});
+</script>
+<script>
+    $(function () {
+        window.showNewCoupon = function (coupon) {
+            data.coupon = coupon;
+        };
+        var data = {coupon: null};
+        new Vue({el: '#newCouponContent', data: data});
+        var loading = {content: '<h4 class="yellow">与服务器通讯中<br>请稍候</h4>'};
+        $('.page2 > div:nth-child(4) :nth-child(1)').click(function () {
+            window.slideTo(3);
+        });
+        $('.page2 > div:nth-child(4) :nth-child(2)').click(function () {
+            Window.show({
+                content: '<h3 class="text-align-center red">八百里加急，<br>快宣你的小伙伴<br>一起进宫用膳！</h3>',
+                sure: true,
+                share: true,
+            });
+        });
+    });
+</script>

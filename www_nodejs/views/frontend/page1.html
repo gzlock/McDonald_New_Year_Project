@@ -1,0 +1,109 @@
+<style>
+    .page1 {
+        position: relative;
+    }
+
+    .page1 .bg {
+        background: url("/public/images/page1.png") no-repeat;
+        background-size: 100vw;
+        background-position-y: bottom;
+    }
+
+    .page1 .main {
+        display: flex;
+        position: relative;
+        height: 100vh;
+    }
+
+    .page1 .button1 {
+        position: absolute;
+        bottom: calc(100vw * 0.2125);
+        left: calc((100vw - (100vw * 0.44375)) / 2);
+        width: calc(100vw * 0.44375);
+        height: calc(100vw * 0.123);
+        /*background: rgba(255, 0, 0, 0.5);*/
+    }
+
+    .page1 .buttons {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        bottom: calc(100vw * 0.0515625);
+        width: 100vw;
+        height: calc(100vw * 0.0796875);
+    }
+
+    .page1 .button2 {
+        flex-grow: 1;
+        /*background: rgba(0, 255, 0, 0.5);*/
+    }
+
+    .page1 .button3 {
+        flex-grow: 1;
+        /*background: rgba(0, 0, 255, 0.5);*/
+    }
+</style>
+<div class="bg main">
+    <div class="button1"></div>
+    <div class="buttons">
+        <div class="button2"></div>
+        <div class="button3"></div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('.page1 .button1').click(function () {
+//            window.slideTo(2);
+            getCoupon1();
+        });
+        $('.page1 .button2').click(function () {
+            window.slideTo(5);
+        });
+        $('.page1 .button3').click(function () {
+            window.slideTo(3);
+        });
+
+        function getCoupon1() {
+            var play = userData.play - userData.share;
+            if (play < 3) {//ajax 拿券
+                getCoupon2();
+            } else if (userData.share == 0) {//次数用完，但仍然可以分享增加一次机会，则弹出提示
+                Window.show({
+                    content: '<h3>今天的领取次数已用完，告诉小伙伴们可获取多一次机会噢！</h3>', sure: true, share: true,
+                });
+            } else {
+                Window.show({
+                    content: '<h3>今天的领取次数已用完</h3>', sure: true, share: true
+                });
+            }
+        }
+
+
+        function getCoupon2() {
+            Window.show({content: '<h4 class="yellow">与服务器通讯中<br>请稍候</h4>'});
+
+            $.get('/coupon/get').then(function (res) {
+                userData.play++;
+                window.newCoupon(res.coupon);
+                window.showNewCoupon(res.coupon);
+                Window.hide();
+                window.slideTo(2);
+            }).catch(function (res) {
+                console.log('/coupon/get catch', res);
+                var message = '与服务器通讯失败', share = false;
+                if (res && res.responseJSON) {
+                    if (res.responseJSON.message)
+                        message = res.responseJSON.message;
+                    if (res.responseJSON.share)
+                        share = true;
+                }
+
+                Window.show({
+                    content: '<h4 class="yellow">' + message + '</h4>',
+                    sure: true,
+                    share: share,
+                });
+            });
+        }
+    })
+</script>

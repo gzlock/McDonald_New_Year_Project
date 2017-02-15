@@ -1,0 +1,52 @@
+<style>
+    .page5 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .page5 > div:nth-child(2) {
+        height: 10vh;
+    }
+
+    .page5 > div:nth-child(3) {
+        overflow: auto;
+    }
+</style>
+
+<div></div>
+<div>
+    <div class="edict">
+        <div class="top edict-bg"></div>
+        <div class="middle edict-bg">
+            <div class="content">
+                <h2 class="text-align-center red">活动规则</h2>
+                <div class="yellow">
+                    <p>活动时间：<br>
+                    2017年2月3日至2017年2月14日</p>
+                    <p>产品兑换时间：<br>
+                    2017年2月3日至2017年2月14日</p>
+                    <p>活动城市：<br>
+                    广州／佛山／清远／河源／梅州／兴宁／普宁／汕头／汕尾／海丰／陆丰／潮阳／潮州／韶关／英德地区麦当劳餐厅（机场／火车站等交通枢纽餐厅,旅游景区餐厅等特殊餐厅除外）</p>
+                    <p>活动规则：<br>
+                    1.进入本活动页面，点击“进宫领赏”，即有机会获得麦当劳新年美食。<br>
+                    2.每人每天有3次获得麦当劳优惠券的机会。<br>
+                    3.分享给朋友可增加1次获得优惠券的机会。<br>
+                    4. 兑换规则详见“我的赏赐”领赏指引页面。请给麦当劳服务员兑换，自行兑换视为无效。</p>
+                    <p>注意事项：<br>
+                    1.每个微信账号每天限领赏4次。<br>
+                    2.活动参与者在参与本次活动时，请勿发布不符合相关法律规定，或违反社会良则之信息。<br>
+                    3.奖品不得兑换或抵扣现金，兑换免费产品时，麦当劳餐厅不再提供发票。奖品兑换不适用麦乐送服务。<br>
+                    4.用户清除手机cookies后会使“麦麦金库”中的记录消失，即用户此前获得的福利将被清空，此种情况由用户本人负责。</p>
+                </div>
+            </div>
+        </div>
+        <div class="bottom edict-bg"></div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('.page5 .bottom').click(function () {
+            window.slideTo(1);
+        });
+    });
+</script>
